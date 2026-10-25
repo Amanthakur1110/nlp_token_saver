@@ -9,6 +9,7 @@ import MetricsPanel from './components/MetricsPanel'
 export default function App() {
   // ── state ──────────────────────────────────────────────────────────────────
   const [techniques, setTechniques] = useState([])
+  const [techniquesLoading, setTechniquesLoading] = useState(true)
   const [techError, setTechError]   = useState('')
 
   const [docInfo, setDocInfo]     = useState(null)  // from upload
@@ -19,8 +20,6 @@ export default function App() {
   const [loading, setLoading]     = useState(false)
   const [runError, setRunError]   = useState('')
   const [report, setReport]       = useState(null)
-
-  const [selectedRow, setSelectedRow] = useState(null)
 
   // ── load techniques on mount ───────────────────────────────────────────────
   useEffect(() => {
@@ -37,6 +36,7 @@ export default function App() {
         setSelected(init)
       })
       .catch(e => setTechError(e.message))
+      .finally(() => setTechniquesLoading(false))
   }, [])
 
   // ── handlers ───────────────────────────────────────────────────────────────
@@ -65,12 +65,10 @@ export default function App() {
     setLoading(true)
     setRunError('')
     setReport(null)
-    setSelectedRow(null)
 
     try {
       const result = await runCompress(docInfo.doc_id, picks, 'both')
       setReport(result)
-      setSelectedRow(firstResultRow(result))
     } catch (e) {
       setRunError(e.message)
     } finally {
@@ -84,12 +82,10 @@ export default function App() {
     setLoading(true)
     setRunError('')
     setReport(null)
-    setSelectedRow(null)
 
     try {
       const result = await runPreset(docInfo.doc_id, preset)
       setReport(result)
-      setSelectedRow(firstResultRow(result))
       // Reflect preset selections in the checkboxes
       // (we'd need preset tech lists from the server; skip for now – just show results)
     } catch (e) {
@@ -118,6 +114,11 @@ export default function App() {
       {techError && (
         <div className="border border-red-400 bg-red-50 text-red-700 p-2 text-sm mb-4">{techError}</div>
       )}
+      {techniquesLoading && (
+        <p className="text-sm text-gray-600 mb-4" role="status" aria-live="polite">
+          Loading compression techniques…
+        </p>
+      )}
       {techniques.length > 0 && (
         <TechniquePicker
           techniques={techniques}
@@ -139,22 +140,41 @@ export default function App() {
       {report && (
         <>
           <MetricsPanel report={report} />
-          <ResultsTable
-            report={report}
-            onSelectRow={setSelectedRow}
-            selectedId={selectedRow ? `${selectedRow._source}_${selectedRow.technique_id}` : null}
-          />
-          {selectedRow && <DiffView result={selectedRow} />}
+          <ResultsTable report={report} />
+          <section aria-labelledby="technique-details-heading">
+            <h2 id="technique-details-heading" className="font-bold text-lg mb-3">
+              4. Technique-by-technique outputs
+            </h2>
+            {getTechniqueDetails(report).map(result => (
+              <DiffView key={`${result._source}_${result.technique_id}`} result={result} />
+            ))}
+          </section>
         </>
       )}
     </div>
   )
 }
 
-function firstResultRow(report) {
-  const individual = report.individual?.find(row => !row.skipped)
-  if (individual) return { ...individual, _source: 'individual' }
+function getTechniqueDetails(report) {
+  const individualResults = (report.individual || [])
+    .filter(result => !result.skipped)
+    .map(result => ({
+      ...result,
+      _source: 'individual',
+      contextLabel: 'Independent result using the uploaded document as input.',
+    }))
 
-  const chainStep = report.chain?.find(row => !row.skipped)
-  return chainStep ? { ...chainStep, _source: 'chain' } : null
+  const hasSuccessfulChainStep = (report.chain || []).some(result => !result.skipped)
+  const combinedResult = report.chain_summary && hasSuccessfulChainStep
+    ? [{
+        technique_id: '__chain__',
+        technique_name: 'Combined Chain',
+        output_text: report.chain_summary.final_text,
+        diff: report.chain_summary.diff,
+        _source: 'chain-summary',
+        contextLabel: 'Final output after all techniques in the chain have been applied.',
+      }]
+    : []
+
+  return [...individualResults, ...combinedResult]
 }

@@ -3,10 +3,8 @@
  *
  * Props:
  *   report      – full report JSON from /api/compress
- *   onSelectRow(result) – called when user clicks a row to view details
- *   selectedId  – id of currently selected row
  */
-export default function ResultsTable({ report, onSelectRow, selectedId }) {
+export default function ResultsTable({ report }) {
   if (!report) return null
 
   // Collect rows: individual results first, then chain summary
@@ -63,7 +61,6 @@ export default function ResultsTable({ report, onSelectRow, selectedId }) {
         </thead>
         <tbody>
           {rows.map(row => {
-            const isSelected = selectedId === `${row._source}_${row.technique_id}`
             if (row.skipped) {
               return (
                 <tr key={row.technique_id} className="opacity-50">
@@ -77,8 +74,7 @@ export default function ResultsTable({ report, onSelectRow, selectedId }) {
             return (
               <tr
                 key={`${row._source}_${row.technique_id}`}
-                className={`cursor-pointer hover:bg-gray-50 border-b border-gray-100 ${isSelected ? 'bg-blue-50' : ''} ${row._source === 'chain' ? 'font-semibold' : ''}`}
-                onClick={() => onSelectRow(row)}
+                className={`border-b border-gray-100 ${row._source === 'chain' ? 'font-semibold' : ''}`}
               >
                 <td className="p-2">{row.technique_name}</td>
                 <td className="p-2">{m.tokens_before ?? '—'}</td>

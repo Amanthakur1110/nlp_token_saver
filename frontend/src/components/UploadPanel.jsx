@@ -38,16 +38,29 @@ export default function UploadPanel({ onUploaded }) {
           ref={fileRef}
           type="file"
           accept=".pdf,.docx,.txt,.md"
+          disabled={status === 'loading'}
           className="border border-gray-300 p-1 text-sm"
         />
         <button
           onClick={handleUpload}
           disabled={status === 'loading'}
-          className="border border-gray-400 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
+          className="border border-gray-400 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 disabled:opacity-60 inline-flex items-center gap-2"
         >
-          {status === 'loading' ? 'Uploading…' : 'Upload'}
+          {status === 'loading' && (
+            <span
+              className="h-3 w-3 animate-spin rounded-full border-2 border-gray-400 border-t-transparent"
+              aria-hidden="true"
+            />
+          )}
+          {status === 'loading' ? 'Uploading and processing…' : 'Upload'}
         </button>
       </div>
+
+      {status === 'loading' && (
+        <p className="text-xs text-blue-700 mb-2" role="status" aria-live="polite">
+          Your document is being uploaded and prepared. This may take a moment for large files.
+        </p>
+      )}
 
       <p className="text-xs text-gray-500 mb-2">Accepted: PDF, DOCX, TXT, MD – max 20 MB</p>
 
@@ -66,4 +79,3 @@ export default function UploadPanel({ onUploaded }) {
     </div>
   )
 }
-

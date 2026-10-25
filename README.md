@@ -16,6 +16,7 @@ Then open **http://localhost:5173** in your browser.
 
 - Backend API: http://localhost:5000/api/health
 - Docker Compose waits for the backend health check before starting the frontend, so its initial API requests do not race backend startup.
+- Results show each selected technique's independent output once, plus the final combined-chain output, with removed text highlighted in red.
 - First build pulls ~2 GB of Python packages + spaCy model.
 - First request that uses sentence-transformers downloads ~400 MB (cached in `hf_cache` volume).
 - First LLMLingua-2 use downloads ~700 MB (also cached).

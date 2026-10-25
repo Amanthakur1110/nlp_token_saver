@@ -27,6 +27,9 @@ export default function DiffView({ result }) {
       <h2 className="font-bold text-lg mb-3">
         4. Detail: {result.technique_name}
       </h2>
+      {result.contextLabel && (
+        <p className="text-xs text-gray-600 mb-3">{result.contextLabel}</p>
+      )}
 
       {/* Two-column diff */}
       <div className="grid grid-cols-2 gap-4 mb-4">
@@ -67,6 +70,9 @@ export default function DiffView({ result }) {
             ))}
           </ul>
         </div>
+      )}
+      {removed_list.length === 0 && (
+        <p className="text-xs text-gray-500 mb-4">No words or phrases were removed by this result.</p>
       )}
 
       {/* Actions */}
