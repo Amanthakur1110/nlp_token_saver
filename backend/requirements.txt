@@ -1,0 +1,30 @@
+# Pinned versions for reproducibility
+flask==3.0.3
+flask-cors==4.0.1
+gunicorn==22.0.0
+
+# File parsing
+pymupdf==1.24.5          # PDF extraction (fitz)
+python-docx==1.1.2       # DOCX extraction
+
+# Tokenisation
+tiktoken==0.7.0
+
+# NLP / ML
+spacy==3.7.5
+preshed==3.0.9           # Pin preshed to prevent ssize_t overflow in 3.0.14
+pysbd==0.3.4             # Sentence boundary disambiguation
+nltk==3.8.1
+scikit-learn==1.5.1
+sentence-transformers==3.0.1
+
+# Optional: LLMLingua-2
+llmlingua==0.2.2
+
+# Optional: Anthropic (abstractive)
+anthropic==0.34.2
+
+# Utilities & Testing
+numpy==1.26.4
+rouge-score==0.1.2
+pytest==8.2.2

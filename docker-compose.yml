@@ -1,0 +1,31 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/api/health', timeout=2)"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 30s
+    volumes:
+      - ./backend:/app          # hot reload in dev
+      - hf_cache:/root/.cache/huggingface
+    env_file: .env
+    environment:
+      - FLASK_ENV=development
+      - HF_HOME=/root/.cache/huggingface
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend/src:/app/src  # hot reload in dev
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  hf_cache:   # persists downloaded Hugging Face models between runs
