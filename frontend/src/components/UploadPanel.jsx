@@ -30,52 +30,65 @@ export default function UploadPanel({ onUploaded }) {
   }
 
   return (
-    <div className="border border-gray-300 p-4 mb-4 bg-white">
-      <h2 className="font-bold text-lg mb-3">1. Upload Document</h2>
+    <section className="panel" aria-labelledby="upload-heading">
+      <div className="panel-heading">
+        <span className="step-number">01</span>
+        <div>
+          <h2 id="upload-heading" className="panel-title">Upload your document</h2>
+          <p className="panel-subtitle">Start with a file you want to make more efficient.</p>
+        </div>
+      </div>
 
-      <div className="flex gap-2 items-center mb-3">
+      <div className="upload-controls">
         <input
           ref={fileRef}
           type="file"
           accept=".pdf,.docx,.txt,.md"
           disabled={status === 'loading'}
-          className="border border-gray-300 p-1 text-sm"
+          className="file-input"
+          aria-label="Choose a document to upload"
         />
         <button
           onClick={handleUpload}
           disabled={status === 'loading'}
-          className="border border-gray-400 px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 disabled:opacity-60 inline-flex items-center gap-2"
+          className="primary-button"
         >
           {status === 'loading' && (
-            <span
-              className="h-3 w-3 animate-spin rounded-full border-2 border-gray-400 border-t-transparent"
-              aria-hidden="true"
-            />
+            <span className="spinner" aria-hidden="true" />
           )}
-          {status === 'loading' ? 'Uploading and processing…' : 'Upload'}
+          {status === 'loading' ? 'Processing…' : 'Upload document'}
         </button>
       </div>
 
       {status === 'loading' && (
-        <p className="text-xs text-blue-700 mb-2" role="status" aria-live="polite">
+        <p className="supporting-text" role="status" aria-live="polite">
           Your document is being uploaded and prepared. This may take a moment for large files.
         </p>
       )}
 
-      <p className="text-xs text-gray-500 mb-2">Accepted: PDF, DOCX, TXT, MD – max 20 MB</p>
+      <p className="supporting-text">PDF, DOCX, TXT, or MD · Maximum file size 20 MB</p>
 
       {error && (
-        <div className="border border-red-400 bg-red-50 text-red-700 p-2 text-sm">{error}</div>
+        <div className="message message-error" role="alert">{error}</div>
       )}
 
       {docInfo && (
-        <div className="border border-gray-200 bg-gray-50 p-3 text-sm mt-2">
-          <p><strong>File:</strong> {docInfo.filename}</p>
-          <p><strong>Characters:</strong> {docInfo.char_count.toLocaleString()}</p>
-          <p><strong>Tokens (cl100k_base):</strong> {docInfo.token_count.toLocaleString()}</p>
-          <p className="mt-2 text-gray-600 text-xs">Preview: {docInfo.preview}</p>
+        <div className="document-info" aria-label="Uploaded document details">
+          <div className="document-stat">
+            <span>FILE</span>
+            <strong title={docInfo.filename}>{docInfo.filename}</strong>
+          </div>
+          <div className="document-stat">
+            <span>CHARACTERS</span>
+            <strong>{docInfo.char_count.toLocaleString()}</strong>
+          </div>
+          <div className="document-stat">
+            <span>TOKENS · CL100K_BASE</span>
+            <strong>{docInfo.token_count.toLocaleString()}</strong>
+          </div>
+          <p className="document-preview">Preview: {docInfo.preview}</p>
         </div>
       )}
-    </div>
+    </section>
   )
 }

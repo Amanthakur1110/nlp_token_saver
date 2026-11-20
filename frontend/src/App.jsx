@@ -97,61 +97,79 @@ export default function App() {
 
   // ── render ─────────────────────────────────────────────────────────────────
   return (
-    <div className="max-w-5xl mx-auto p-4">
+    <main className="app-shell">
+      <div className="page-wrap">
+        <header className="app-header">
+          <a className="brand" href="#" aria-label="TokenSaver home">
+            <span className="brand-mark" aria-hidden="true">T</span>
+            <span>tokensaver<span className="brand-period">.</span></span>
+          </a>
+          <span className="header-note">A NLP PIPELINE <span className="status-dot" /> READY</span>
+        </header>
 
-      {/* Header */}
-      <header className="border-b border-gray-300 pb-3 mb-4">
-        <h1 className="text-2xl font-bold">TokenSaver</h1>
-        <p className="text-sm text-gray-600">
-          Upload a document, apply token-saving techniques, see how many tokens were saved.
-        </p>
-      </header>
+        <section className="hero">
+          <p className="eyebrow">LESS NOISE. SAME MEANING.</p>
+          <h1>Make every token<br className="hero-break" /> <span>count.</span></h1>
+          <p className="hero-copy">
+            Compress your documents intelligently. Compare techniques, preserve meaning, and see exactly what changed.
+          </p>
+        </section>
 
-      {/* Upload */}
-      <UploadPanel onUploaded={setDocInfo} />
+        <div className="workspace">
+          <UploadPanel onUploaded={setDocInfo} />
 
-      {/* Technique picker */}
-      {techError && (
-        <div className="border border-red-400 bg-red-50 text-red-700 p-2 text-sm mb-4">{techError}</div>
-      )}
-      {techniquesLoading && (
-        <p className="text-sm text-gray-600 mb-4" role="status" aria-live="polite">
-          Loading compression techniques…
-        </p>
-      )}
-      {techniques.length > 0 && (
-        <TechniquePicker
-          techniques={techniques}
-          selected={selected}
-          onToggle={handleToggle}
-          onParam={handleParam}
-          onRun={handleRun}
-          onPreset={handlePreset}
-          loading={loading}
-        />
-      )}
+          {techError && (
+            <div className="message message-error" role="alert">{techError}</div>
+          )}
+          {techniquesLoading && (
+            <p className="loading-note" role="status" aria-live="polite">
+              <span className="spinner" aria-hidden="true" />
+              Loading compression techniques…
+            </p>
+          )}
+          {techniques.length > 0 && (
+            <TechniquePicker
+              techniques={techniques}
+              selected={selected}
+              onToggle={handleToggle}
+              onParam={handleParam}
+              onRun={handleRun}
+              onPreset={handlePreset}
+              loading={loading}
+            />
+          )}
 
-      {/* Run error */}
-      {runError && (
-        <div className="border border-red-400 bg-red-50 text-red-700 p-2 text-sm mb-4">{runError}</div>
-      )}
+          {runError && (
+            <div className="message message-error" role="alert">{runError}</div>
+          )}
 
-      {/* Results */}
-      {report && (
-        <>
-          <MetricsPanel report={report} />
-          <ResultsTable report={report} />
-          <section aria-labelledby="technique-details-heading">
-            <h2 id="technique-details-heading" className="font-bold text-lg mb-3">
-              4. Technique-by-technique outputs
-            </h2>
-            {getTechniqueDetails(report).map(result => (
-              <DiffView key={`${result._source}_${result.technique_id}`} result={result} />
-            ))}
-          </section>
-        </>
-      )}
-    </div>
+          {report && (
+            <section className="results-section" aria-label="Compression results">
+              <div className="section-heading">
+                <p className="eyebrow">YOUR ANALYSIS</p>
+                <h2>Results <span className="heading-rule" /></h2>
+              </div>
+              <MetricsPanel report={report} />
+              <ResultsTable report={report} />
+              <section aria-labelledby="technique-details-heading">
+                <div className="section-heading details-heading">
+                  <p className="eyebrow">SIDE-BY-SIDE COMPARISON</p>
+                  <h2 id="technique-details-heading">Technique details</h2>
+                </div>
+                {getTechniqueDetails(report).map(result => (
+                  <DiffView key={`${result._source}_${result.technique_id}`} result={result} />
+                ))}
+              </section>
+            </section>
+          )}
+        </div>
+
+        <footer className="app-footer">
+          <span>TokenSaver</span>
+          <span>Thoughtful compression for better workflows.</span>
+        </footer>
+      </div>
+    </main>
   )
 }
 

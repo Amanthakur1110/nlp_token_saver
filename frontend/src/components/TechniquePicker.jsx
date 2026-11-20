@@ -16,17 +16,24 @@ export default function TechniquePicker({
   const PRESETS = ['safe', 'balanced', 'max_saver']
 
   return (
-    <div className="border border-gray-300 p-4 mb-4 bg-white">
-      <h2 className="font-bold text-lg mb-3">2. Select Techniques</h2>
+    <section className="panel" aria-labelledby="techniques-heading">
+      <div className="panel-heading">
+        <span className="step-number">02</span>
+        <div>
+          <h2 id="techniques-heading" className="panel-title">Choose your approach</h2>
+          <p className="panel-subtitle">Combine techniques or start from a preset.</p>
+        </div>
+      </div>
 
       {/* Preset buttons */}
-      <div className="flex gap-2 mb-4">
-        <span className="text-sm self-center text-gray-600">Presets:</span>
+      <div className="preset-row">
+        <span className="preset-label">QUICK START</span>
         {PRESETS.map(p => (
           <button
             key={p}
             onClick={() => onPreset(p)}
-            className="border border-gray-400 px-2 py-0.5 text-xs bg-gray-100 hover:bg-gray-200"
+            disabled={loading}
+            className="preset-button"
           >
             {p.replace('_', ' ')}
           </button>
@@ -34,7 +41,7 @@ export default function TechniquePicker({
       </div>
 
       {/* Technique list */}
-      <div className="space-y-3">
+      <div className="technique-list">
         {techniques.map(t => {
           const sel = selected[t.id] || {}
           const isChecked = !!sel.checked
@@ -43,31 +50,31 @@ export default function TechniquePicker({
           return (
             <div
               key={t.id}
-              className={`border p-3 ${isDisabled ? 'border-gray-200 bg-gray-50 opacity-60' : 'border-gray-300'}`}
+              className={`technique-card ${isChecked ? 'is-selected' : ''} ${isDisabled ? 'is-unavailable' : ''}`}
             >
               {/* Header row */}
-              <label className="flex items-start gap-2 cursor-pointer">
+              <label className="technique-label">
                 <input
                   type="checkbox"
                   disabled={isDisabled}
                   checked={isChecked}
                   onChange={() => onToggle(t.id)}
-                  className="mt-0.5"
+                  className="technique-checkbox"
                 />
                 <div>
-                  <span className="font-medium text-sm">{t.name}</span>
+                  <span className="technique-name">{t.name}</span>
                   {isDisabled && (
-                    <span className="ml-2 text-xs text-gray-500">
-                      (unavailable: {t.unavailable_reason})
+                    <span className="unavailable-note">
+                      · Unavailable: {t.unavailable_reason}
                     </span>
                   )}
-                  <p className="text-xs text-gray-600 mt-0.5">{t.description}</p>
+                  <p className="technique-description">{t.description}</p>
                 </div>
               </label>
 
               {/* Parameter controls – only when checked and available */}
               {isChecked && !isDisabled && t.params_schema.length > 0 && (
-                <div className="mt-2 ml-5 space-y-2">
+                <div className="param-list">
                   {t.params_schema.map(param => (
                     <ParamControl
                       key={param.name}
@@ -83,28 +90,28 @@ export default function TechniquePicker({
         })}
       </div>
 
-      <button
-        onClick={onRun}
-        disabled={loading}
-        className="mt-4 border border-gray-600 px-4 py-1.5 text-sm bg-gray-800 text-white hover:bg-gray-700 disabled:opacity-50"
-      >
-        {loading ? 'Running…' : 'Run compression'}
-      </button>
-    </div>
+      <div className="run-row">
+        <span className="run-hint">Your original document stays unchanged.</span>
+        <button onClick={onRun} disabled={loading} className="primary-button">
+          {loading && <span className="spinner" aria-hidden="true" />}
+          {loading ? 'Compressing…' : 'Run compression'}
+        </button>
+      </div>
+    </section>
   )
 }
 
 /** Renders a single parameter control based on its schema type. */
 function ParamControl({ param, value, onChange }) {
   const label = (
-    <label className="text-xs text-gray-700 block mb-0.5">{param.label}</label>
+    <label className="param-label">{param.label}</label>
   )
 
   if (param.type === 'slider') {
     return (
       <div>
         {label}
-        <div className="flex items-center gap-2">
+        <div className="range-row">
           <input
             type="range"
             min={param.min}
@@ -112,9 +119,8 @@ function ParamControl({ param, value, onChange }) {
             step={param.step}
             value={value}
             onChange={e => onChange(parseFloat(e.target.value))}
-            className="w-40"
           />
-          <span className="text-xs w-8">{value}</span>
+          <span className="range-value">{value}</span>
         </div>
       </div>
     )
@@ -127,7 +133,7 @@ function ParamControl({ param, value, onChange }) {
         <select
           value={value}
           onChange={e => onChange(parseInt(e.target.value))}
-          className="border border-gray-300 text-xs p-0.5"
+          className="param-control"
         >
           {param.options.map(o => (
             <option key={o.value} value={o.value}>{o.label}</option>
@@ -145,7 +151,7 @@ function ParamControl({ param, value, onChange }) {
           type="text"
           value={value}
           onChange={e => onChange(e.target.value)}
-          className="border border-gray-300 text-xs p-0.5 w-60"
+          className="param-control"
           placeholder={param.default}
         />
       </div>
@@ -154,4 +160,3 @@ function ParamControl({ param, value, onChange }) {
 
   return null
 }
-

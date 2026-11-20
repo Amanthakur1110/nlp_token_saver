@@ -62,13 +62,10 @@ class ExtractiveSummary(BaseTechnique):
     ]
 
     def is_available(self) -> tuple[bool, str]:
-        try:
-            from utils.nlp_models import get_sentence_model
-            if get_sentence_model() is None:
-                return False, "sentence-transformers model not loaded"
-            return True, ""
-        except Exception as e:
-            return False, str(e)
+        from utils.nlp_models import sentence_model_possible
+        if not sentence_model_possible():
+            return False, "sentence-transformers package is not installed"
+        return True, ""
 
     def apply(self, text: str, params: dict) -> str:
         import numpy as np
@@ -94,8 +91,6 @@ class ExtractiveSummary(BaseTechnique):
             return text
 
         model = get_sentence_model()
-        if model is None:
-            return text
 
         # 2. Embed body sentences; cosine = dot product after normalising
         emb = model.encode([units[i][1] for i in body], normalize_embeddings=True)

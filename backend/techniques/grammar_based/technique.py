@@ -105,18 +105,14 @@ class GrammarBased(BaseTechnique):
     ]
 
     def is_available(self) -> tuple[bool, str]:
-        try:
-            from utils.nlp_models import get_spacy_model
-            m = get_spacy_model()
-            return (True, "") if m is not None else (False, "spaCy model not loaded")
-        except Exception as e:
-            return False, str(e)
+        from utils.nlp_models import spacy_model_possible
+        if not spacy_model_possible():
+            return False, "spaCy or its en_core_web_sm model package is not installed"
+        return True, ""
 
     def apply(self, text: str, params: dict) -> str:
         from utils.nlp_models import get_spacy_model
         nlp = get_spacy_model()
-        if nlp is None:
-            return text  # fail safe: return unchanged
 
         level = int(params.get("strictness", 1))
         doc = nlp(text)
@@ -131,4 +127,3 @@ class GrammarBased(BaseTechnique):
         result = "".join(kept_tokens)
         # Clean up double spaces introduced by removed words
         return re.sub(r"  +", " ", result).strip()
-

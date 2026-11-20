@@ -1,9 +1,4 @@
-"""
-technique.py – Whitespace Cleanup
 
-Collapses extra blank lines, strips page numbers, removes repeated
-headers/footers, and fixes broken PDF line-breaks. Lossless compression.
-"""
 import re
 from techniques.base import BaseTechnique
 

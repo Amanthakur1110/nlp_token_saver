@@ -29,9 +29,9 @@ def percent_saved(before: int, after: int) -> float:
 def semantic_similarity(original: str, compressed: str):
     """Cosine similarity of sentence embeddings. Returns None if unavailable."""
     try:
-        from utils.nlp_models import get_sentence_model
+        from utils.nlp_models import get_loaded_sentence_model
         import numpy as np
-        model = get_sentence_model()
+        model = get_loaded_sentence_model()
         if model is None:
             return None
         emb = model.encode([original, compressed])
@@ -48,8 +48,8 @@ def semantic_similarity(original: str, compressed: str):
 def entity_retention(original: str, compressed: str):
     """% of spaCy named entities from original still present in compressed."""
     try:
-        from utils.nlp_models import get_spacy_model
-        nlp = get_spacy_model()
+        from utils.nlp_models import get_loaded_spacy_model
+        nlp = get_loaded_spacy_model()
         if nlp is None:
             return None
         orig_ents = {ent.text.lower() for ent in nlp(original).ents}
@@ -101,4 +101,3 @@ def compute_metrics(original: str, compressed: str, elapsed_ms: float) -> dict:
         "rouge_l": rouge_l(original, compressed),
         "time_ms": elapsed_ms,
     }
-

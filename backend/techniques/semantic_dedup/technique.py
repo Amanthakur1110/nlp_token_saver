@@ -33,12 +33,10 @@ class SemanticDedup(BaseTechnique):
     ]
 
     def is_available(self) -> tuple[bool, str]:
-        try:
-            from utils.nlp_models import get_sentence_model
-            m = get_sentence_model()
-            return (True, "") if m is not None else (False, "sentence-transformers model not loaded")
-        except Exception as e:
-            return False, str(e)
+        from utils.nlp_models import sentence_model_possible
+        if not sentence_model_possible():
+            return False, "sentence-transformers package is not installed"
+        return True, ""
 
     def apply(self, text: str, params: dict) -> str:
         import numpy as np
@@ -51,8 +49,6 @@ class SemanticDedup(BaseTechnique):
             return text
 
         model = get_sentence_model()
-        if model is None:
-            return text
 
         embeddings = model.encode(sentences)
 
@@ -73,4 +69,3 @@ class SemanticDedup(BaseTechnique):
                 kept_embeddings.append(emb)
 
         return " ".join(sentences[i] for i in kept_indices)
-

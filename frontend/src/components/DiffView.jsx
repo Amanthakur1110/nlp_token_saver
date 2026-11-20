@@ -23,23 +23,21 @@ export default function DiffView({ result }) {
   }
 
   return (
-    <div className="border border-gray-300 bg-white p-4 mb-4">
-      <h2 className="font-bold text-lg mb-3">
-        4. Detail: {result.technique_name}
-      </h2>
+    <article className="diff-panel">
+      <h3 className="diff-title">{result.technique_name}</h3>
       {result.contextLabel && (
-        <p className="text-xs text-gray-600 mb-3">{result.contextLabel}</p>
+        <p className="diff-context">{result.contextLabel}</p>
       )}
 
       {/* Two-column diff */}
-      <div className="grid grid-cols-2 gap-4 mb-4">
+      <div className="diff-grid">
         {/* Left: original with removed words and phrases highlighted */}
         <div>
-          <p className="text-xs font-semibold text-gray-600 mb-1">Original</p>
-          <div className="border border-gray-200 p-3 text-xs leading-relaxed max-h-64 overflow-y-auto whitespace-pre-wrap break-words">
+          <p className="diff-column-title">Original</p>
+          <div className="diff-content">
             {segments.map((seg, i) =>
               seg.status === 'removed' ? (
-                <span key={i} className="bg-red-100 text-red-700 rounded">
+                <span key={i} className="removed-segment">
                   {seg.text}
                 </span>
               ) : (
@@ -51,8 +49,8 @@ export default function DiffView({ result }) {
 
         {/* Right: compressed output */}
         <div>
-          <p className="text-xs font-semibold text-gray-600 mb-1">Compressed</p>
-          <div className="border border-gray-200 p-3 text-xs leading-relaxed max-h-64 overflow-y-auto whitespace-pre-wrap">
+          <p className="diff-column-title">Compressed</p>
+          <div className="diff-content">
             {result.output_text}
           </div>
         </div>
@@ -60,36 +58,36 @@ export default function DiffView({ result }) {
 
       {/* Removed content list */}
       {removed_list.length > 0 && (
-        <div className="mb-4">
-          <p className="text-xs font-semibold text-gray-600 mb-1">
+        <div className="removed-section">
+          <p className="diff-column-title">
             Removed words and phrases ({removed_list.length})
           </p>
-          <ul className="border border-gray-200 p-2 max-h-32 overflow-y-auto text-xs space-y-1">
+          <ul className="removed-list">
             {removed_list.map((s, i) => (
-              <li key={i} className="text-red-700 bg-red-50 px-1 rounded">{s}</li>
+              <li key={i}>{s}</li>
             ))}
           </ul>
         </div>
       )}
       {removed_list.length === 0 && (
-        <p className="text-xs text-gray-500 mb-4">No words or phrases were removed by this result.</p>
+        <p className="no-removals">No words or phrases were removed by this result.</p>
       )}
 
       {/* Actions */}
-      <div className="flex gap-2">
+      <div className="action-row">
         <button
           onClick={handleCopy}
-          className="border border-gray-400 px-2 py-0.5 text-xs bg-gray-100 hover:bg-gray-200"
+          className="action-button"
         >
           Copy compressed text
         </button>
         <button
           onClick={handleDownload}
-          className="border border-gray-400 px-2 py-0.5 text-xs bg-gray-100 hover:bg-gray-200"
+          className="action-button"
         >
           Download .txt
         </button>
       </div>
-    </div>
+    </article>
   )
 }

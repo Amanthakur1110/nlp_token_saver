@@ -1,11 +1,4 @@
-"""
-runner.py – Stage 3: execute selected techniques and collect per-step data.
 
-Supports two modes:
-  individual – each technique is applied independently to the cleaned text.
-  chain      – techniques are applied in sequence; output feeds the next.
-  both       – run individual first, then chain.
-"""
 import time
 from techniques.registry import get_technique_by_id
 from pipeline.metrics import compute_metrics
@@ -60,7 +53,12 @@ def run_techniques(cleaned_text: str, techniques: list[dict], mode: str) -> dict
     if mode in ("chain", "both"):
         chain_steps = []
         current_text = cleaned_text
-        for spec in techniques:
+        chain_techniques = [
+            spec for spec in techniques if spec["id"] != "alias_substitution"
+        ] + [
+            spec for spec in techniques if spec["id"] == "alias_substitution"
+        ]
+        for spec in chain_techniques:
             t = get_technique_by_id(spec["id"])
             if t is None:
                 continue
@@ -80,4 +78,3 @@ def run_techniques(cleaned_text: str, techniques: list[dict], mode: str) -> dict
         results["chain_final_text"] = current_text
 
     return results
-

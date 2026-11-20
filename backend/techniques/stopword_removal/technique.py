@@ -1,9 +1,4 @@
-"""
-technique.py – Stopword Removal
 
-Removes common stopwords (NLTK list) while protecting negations and numbers.
-Users can add custom protected words via params.
-"""
 import re
 from techniques.base import BaseTechnique
 

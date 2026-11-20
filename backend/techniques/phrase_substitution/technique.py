@@ -1,9 +1,4 @@
-"""
-technique.py – Phrase Substitution
 
-Replaces verbose phrases with shorter equivalents.
-The phrase list is a plain dict so it is easy to read and extend.
-"""
 import re
 from techniques.base import BaseTechnique
 

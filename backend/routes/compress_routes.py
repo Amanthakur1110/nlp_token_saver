@@ -9,6 +9,7 @@ from flask import Blueprint, request, jsonify
 from pipeline.cleaner import clean_text
 from pipeline.runner import run_techniques
 from pipeline.report import build_report
+from utils.nlp_models import ModelLoadError
 
 compress_bp = Blueprint("compress", __name__)
 
@@ -19,6 +20,7 @@ PRESETS = {
         {"id": "whitespace_cleanup", "params": {}},
         {"id": "deduplication",      "params": {"threshold": 0.95}},
         {"id": "phrase_substitution","params": {}},
+        {"id": "alias_substitution", "params": {}},
     ],
     "balanced": [
         {"id": "whitespace_cleanup", "params": {}},
@@ -26,6 +28,7 @@ PRESETS = {
         {"id": "phrase_substitution","params": {}},
         {"id": "stopword_removal",   "params": {"protected_words": []}},
         {"id": "tfidf_pruning",      "params": {"keep_pct": 70}},
+        {"id": "alias_substitution", "params": {}},
     ],
     "max_saver": [
         {"id": "whitespace_cleanup", "params": {}},
@@ -34,6 +37,7 @@ PRESETS = {
         {"id": "grammar_based",      "params": {"strictness": 2}},
         {"id": "tfidf_pruning",      "params": {"keep_pct": 50}},
         {"id": "extractive_summary", "params": {"keep_pct": 40}},
+        {"id": "alias_substitution", "params": {}},
     ],
 }
 
@@ -71,7 +75,10 @@ def compress():
     cleaned = clean_text(raw_text)
 
     # Stage 3 + 4 + 5: run, measure, diff
-    results = run_techniques(cleaned, techniques, mode)
+    try:
+        results = run_techniques(cleaned, techniques, mode)
+    except ModelLoadError as exc:
+        return jsonify({"error": str(exc)}), 503
 
     # Stage 6: assemble final JSON
     report = build_report(doc_id, cleaned, results, mode)
@@ -83,4 +90,3 @@ def compress():
 def list_presets():
     """Return preset names and their technique lists."""
     return jsonify({name: techs for name, techs in PRESETS.items()})
-
